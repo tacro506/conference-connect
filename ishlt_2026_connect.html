@@ -160,6 +160,9 @@
       transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+      border: none;
+      width: 100%;
     }
 
     .btn::after {
@@ -199,6 +202,61 @@
       width: 20px; height: 20px;
     }
 
+    /* Email group: main button + copy fallback */
+    .email-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .copy-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .email-address {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cardinal);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.2rem 0.55rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .copy-btn:hover {
+      background: var(--cardinal);
+      color: white;
+      border-color: var(--cardinal);
+    }
+    .copy-btn svg { width: 11px; height: 11px; }
+
+    .copy-confirm {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #2d7a3a;
+      letter-spacing: 0.08em;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .copy-confirm.show { opacity: 1; }
+
     .footer {
       margin-top: 2.8rem;
       font-family: 'JetBrains Mono', monospace;
@@ -227,14 +285,29 @@
     <p class="prompt">Get in touch</p>
 
     <div class="actions">
-      <!-- Email -->
-      <a class="btn btn-email" href="/cdn-cgi/l/email-protection#78101d160a111b1d12380b0c19161e170a1c561d1c0d">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="4" width="20" height="16" rx="2"/>
-          <path d="M2 7l10 7 10-7"/>
-        </svg>
-        Send me an email
-      </a>
+
+      <!-- Email group -->
+      <div class="email-group">
+        <a class="btn btn-email" href="mailto:henricej@stanford.edu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M2 7l10 7 10-7"/>
+          </svg>
+          Send me an email
+        </a>
+
+        <!-- Copy fallback -->
+        <div class="copy-row">
+          <span class="email-address">henricej@stanford.edu</span>
+          <button class="copy-btn" onclick="copyEmail()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </button>
+          <span class="copy-confirm" id="copy-confirm">✓ Copied!</span>
+        </div>
+      </div>
 
       <!-- LinkedIn -->
       <a class="btn btn-linkedin" href="https://www.linkedin.com/in/erik-henricksen/" target="_blank" rel="noopener">
@@ -247,4 +320,36 @@
       </a>
     </div>
 
-    <p class="footer">Scanned from conference poster &nbsp
+    <p class="footer">Scanned from ISHLT 2026 Annual Meeting Poster</p>
+  </div>
+
+  <script>
+    function copyEmail() {
+      const email = 'henricej@stanford.edu';
+      const confirm = document.getElementById('copy-confirm');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(showConfirm).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+
+      function fallbackCopy() {
+        const el = document.createElement('textarea');
+        el.value = email;
+        el.style.position = 'fixed';
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+        el.focus(); el.select();
+        try { document.execCommand('copy'); showConfirm(); } catch(e) {}
+        document.body.removeChild(el);
+      }
+
+      function showConfirm() {
+        confirm.classList.add('show');
+        setTimeout(() => confirm.classList.remove('show'), 2500);
+      }
+    }
+  </script>
+</body>
+</html>
